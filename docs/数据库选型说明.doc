@@ -1,0 +1,17 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="ProgId" content="Word.Document">
+<title>数据库选型说明</title>
+</head>
+<body>
+<h1>数据库选型说明（MVP）</h1>
+<table border="1" cellpadding="6" cellspacing="0">
+<tr><th>组件</th><th>选型</th><th>说明</th></tr>
+<tr><td>业务数据库</td><td>MySQL 8</td><td>事务、生态成熟、易运维</td></tr>
+<tr><td>文件与加密对象</td><td>本地卷 / 对象存储</td><td>MVP 使用卷映射；可换 S3 兼容存储</td></tr>
+<tr><td>缓存</td><td>可选 Redis</td><td>二期：会话、限流</td></tr>
+</table>
+<p>详细表结构见 <code>docs/DATABASE_DESIGN.md</code>。</p>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="ProgId" content="Word.Document">
+<title>技术选型说明</title>
+</head>
+<body>
+<h1>技术选型说明（MVP）</h1>
+<ul>
+<li><b>前端：</b>Vue 3、TypeScript、Vite、Element Plus、Pinia、Vue Router、ECharts</li>
+<li><b>后端：</b>Spring Boot 3、Java 17、Spring Security（JWT）、Spring Data JPA</li>
+<li><b>AI：</b>Anthropic Claude Messages API；提示词 Skill 化（<code>SkillPrompts</code>）</li>
+<li><b>文档：</b>SpringDoc OpenAPI（Swagger UI）</li>
+<li><b>部署：</b>Docker Compose；Nginx 托管前端并反向代理 API</li>
+</ul>
+<p>与 Markdown 版保持同步，便于 Word 直接打开编辑。</p>
+</body>
+</html>

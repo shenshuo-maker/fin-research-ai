@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<!-- 已迁移：正式界面为「金融科研」Vue 应用 frontend/；静态说明见 docs/fin-research-design-reference.html -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>（归档）医研AI — 医学科研全流程智能助手</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0d1117;
+  --paper: #f8f6f1;
+  --cream: #ede9e0;
+  --accent: #1a4a3a;
+  --accent2: #c8522a;
+  --muted: #6b7280;
+  --border: #d4cfc5;
+  --card: #ffffff;
+  --highlight: #e8f4ee;
+  --warn: #fff3eb;
+  --radius: 2px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── LAYOUT ── */
+.app { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.logo-mark {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 22px;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.logo-mark span { color: #4caf82; }
+.logo-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 2px;
+  letter-spacing: 1px;
+}
+
+.nav { flex: 1; padding: 16px 0; overflow-y: auto; }
+.nav-section-title {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.25);
+  padding: 12px 20px 6px;
+  text-transform: uppercase;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+  color: rgba(255,255,255,0.55);
+  font-size: 13px;
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); }
+.nav-item.active {
+  background: rgba(76,175,130,0.12);
+  border-left-color: #4caf82;
+  color: #4caf82;
+}
+.nav-icon { font-size: 15px; width: 20px; text-align: center; }
+
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4caf82, #1a6b4a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #fff;
+  font-weight: 600;
+}
+.user-info { flex: 1; }
+.user-name { font-size: 12px; color: rgba(255,255,255,0.8); }
+.user-role { font-size: 10px; color: rgba(255,255,255,0.3); }
+
+/* ── MAIN ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  height: 56px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.breadcrumb {
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.breadcrumb strong { color: var(--ink); font-weight: 600; }
+
+.topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.badge-secure {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--accent);
+  background: var(--highlight);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(26,74,58,0.15);
+}
+
+/* ── CONTENT AREA ── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px;
+}
+
+/* ── PANELS ── */
+.panel { display: none; animation: fadeIn 0.25s ease; }
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── PAGE HEADER ── */
+.page-header { margin-bottom: 24px; }
+.page-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.page-desc { font-size: 13px; color: var(--muted); }
+
+/* ── CARDS ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title-icon { font-size: 16px; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+/* ── FORM ELEMENTS ── */
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.form-label span { color: var(--muted); font-weight: 400; }
+
+input[type="text"], textarea, select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--paper);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(26,74,58,0.08);
+  background: #fff;
+}
+textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover { background: #153d2f; }
+.btn-secondary {
+  background: var(--cream);
+  color: var(--ink);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--border); }
+.btn-danger {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+.btn-full { width: 100%; justify-content: center; }
+
+/* ── AI OUTPUT ── */
+.ai-output {
+  background: #f7fbf9;
+  border: 1px solid #c6e0d4;
+  border-radius: var(--radius);
+  padding: 16px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--ink);
+  min-height: 80px;
+  position: relative;
+}
+.ai-output.loading { color: var(--muted); }
+.ai-output.empty { color: var(--muted); font-style: italic; }
+.ai-label {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ai-label::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4caf82;
+}
+
+/* typing animation */
+.typing-cursor::after {
+  content: '▋';
+  animation: blink 0.7s step-end infinite;
+  font-size: 12px;
+  color: var(--accent);
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ── LOADING SPINNER ── */
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(26,74,58,0.2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 20px;
+  gap: 0;
+}
+.tab {
+  padding: 9px 20px;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  color: var(--muted);
+  transition: all 0.15s;
+  font-weight: 500;
+}
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab:hover { color: var(--ink); }
+
+/* ── TABLE ── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.data-table th {
+  background: var(--cream);
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink);
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink);
+}
+.data-table tr:hover td { background: #f9f9f7; }
+
+/* ── TAG ── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.tag-green { background: #dcfce7; color: #166534; }
+.tag-orange { background: #fed7aa; color: #9a3412; }
+.tag-blue { background: #dbeafe; color: #1e40af; }
+.tag-gray { background: #f3f4f6; color: #374151; }
+
+/* ── PROGRESS ── */
+.progress-bar {
+  height: 4px;
+  background: var(--cream);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #4caf82);
+  border-radius: 4px;
+  transition: width 1s ease;
+}
+
+/* ── STEP INDICATOR ── */
+.steps {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 0;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: var(--cream);
+  color: var(--muted);
+  border: 2px solid var(--border);
+}
+.step.active .step-num { background: var(--accent); color: #fff; border-color: var(--accent); }
+.step.done .step-num { background: #4caf82; color: #fff; border-color: #4caf82; }
+.step-label { font-size: 12px; color: var(--muted); }
+.step.active .step-label { color: var(--ink); font-weight: 600; }
+.step-line { flex: 1; height: 1px; background: var(--border); margin: 0 8px; max-width: 40px; }
+
+/* ── DASHBOARD HOME ── */
+.stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 18px 20px;
+  border-radius: var(--radius);
+}
+.stat-num { font-size: 28px; font-weight: 700; font-family: 'Noto Serif SC', serif; color: var(--ink); }
+.stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.stat-change { font-size: 11px; margin-top: 6px; }
+.stat-change.up { color: #16a34a; }
+
+.quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+.quick-action {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-radius: var(--radius);
+}
+.quick-action:hover { border-color: var(--accent); background: var(--highlight); transform: translateY(-1px); box-shadow: var(--shadow); }
+.quick-action-icon { font-size: 24px; margin-bottom: 8px; }
+.quick-action-label { font-size: 12px; font-weight: 500; color: var(--ink); }
+.quick-action-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.recent-table th, .recent-table td { font-size: 12px; }
+
+/* ── CHIP TAGS ── */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--cream);
+  color: var(--ink);
+  transition: all 0.15s;
+}
+.chip:hover, .chip.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ── ALERT ── */
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+.alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+.alert-warn { background: var(--warn); border: 1px solid #fed7aa; color: #9a3412; }
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* ── RESPONSIVE tweaks ── */
+.row { display: flex; gap: 16px; }
+.col { flex: 1; }
+.col-2 { flex: 2; }
+
+/* ── SECTION ACTIONS ── */
+.section-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══════════════ SIDEBAR ══════════════ -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">医研<span>AI</span></div>
+    <div class="logo-sub">MEDICAL RESEARCH PLATFORM</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section-title">工作台</div>
+    <div class="nav-item active" onclick="showPanel('home')">
+      <span class="nav-icon">🏠</span>首页概览
+    </div>
+
+    <div class="nav-section-title">选题模块</div>
+    <div class="nav-item" onclick="showPanel('literature')">
+      <span class="nav-icon">📖</span>文献解读
+    </div>
+    <div class="nav-item" onclick="showPanel('topic')">
+      <span class="nav-icon">🔭</span>科研选题
+    </div>
+    <div class="nav-item" onclick="showPanel('rwe')">
+      <span class="nav-icon">🌐</span>真实世界研究
+    </div>
+    <div class="nav-item" onclick="showPanel('prospect')">
+      <span class="nav-icon">📊</span>发表前景评估
+    </div>
+
+    <div class="nav-section-title">数据模块</div>
+    <div class="nav-item" onclick="showPanel('edc')">
+      <span class="nav-icon">🗂️</span>EDC数据采集
+    </div>
+    <div class="nav-item" onclick="showPanel('clean')">
+      <span class="nav-icon">🧹</span>数据清洗
+    </div>
+    <div class="nav-item" onclick="showPanel('stats')">
+      <span class="nav-icon">📈</span>统计分析
+    </div>
+
+    <div class="nav-section-title">写作模块</div>
+    <div class="nav-item" onclick="showPanel('write')">
+      <span class="nav-icon">✍️</span>论文撰写
+    </div>
+    <div class="nav-item" onclick="showPanel('rewrite')">
+      <span class="nav-icon">🔄</span>段落改写润色
+    </div>
+    <div class="nav-item" onclick="showPanel('refs')">
+      <span class="nav-icon">🔗</span>文献匹配
+    </div>
+
+    <div class="nav-section-title">回修模块</div>
+    <div class="nav-item" onclick="showPanel('revise')">
+      <span class="nav-icon">✉️</span>审稿意见回复
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-badge">
+      <div class="avatar">张</div>
+      <div class="user-info">
+        <div class="user-name">张建国 主任医师</div>
+        <div class="user-role">北京协和医院</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<div class="main">
+  <div class="topbar">
+    <div class="breadcrumb" id="breadcrumb">
+      <span>工作台</span><span>›</span><strong>首页概览</strong>
+    </div>
+    <div class="topbar-actions">
+      <div class="badge-secure">🔒 数据已脱敏加密</div>
+      <button class="btn btn-secondary btn-sm" onclick="showPanel('edc')">＋ 新建项目</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ HOME ══ -->
+    <div class="panel active" id="panel-home">
+      <div class="page-header">
+        <div class="page-title">欢迎回来，张医生 👋</div>
+        <div class="page-desc">今日 2024年3月15日 · 您有 2 项目进行中 · 1 篇论文待回修</div>
+      </div>
+
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-num">7</div>
+          <div class="stat-label">进行中项目</div>
+          <div class="stat-change up">↑ 2 本月新增</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">23</div>
+          <div class="stat-label">已解读文献</div>
+          <div class="stat-change up">↑ 5 本周</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">4</div>
+          <div class="stat-label">已提交论文</div>
+          <div class="stat-change up">↑ 1 本月</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">1</div>
+          <div class="stat-label">待处理回修</div>
+          <div class="stat-change" style="color:#dc2626">⚠ 需尽快处理</div>
+        </div>
+      </div>
+
+      <div class="page-title" style="font-size:15px;margin-bottom:14px;font-family:'Noto Sans SC';">快速开始</div>
+      <div class="quick-actions">
+        <div class="quick-action" onclick="showPanel('literature')">
+          <div class="quick-action-icon">📖</div>
+          <div class="quick-action-label">解读文献</div>
+          <div class="quick-action-sub">上传PDF快速提炼</div>
+        </div>
+        <div class="quick-action" onclick="showPanel('topic')">
+          <div class="quick-action-icon">🔭</div>
+          <div class="quick-action-label">AI选题</div>
+          <div class="quick-action-sub">智能推荐研究方向</div>
+        </div>
+        <div class="quick-action" onclick="showPanel('write')">
+          <div class="quick-action-icon">✍️</div>
+          <div class="quick-action-label">开始写作</div>
+          <div class="quick-action-sub">AI辅助全文生成</div>
+        </div>
+        <div class="quick-action" onclick="showPanel('revise')">
+          <div class="quick-action-icon">✉️</div>
+          <div class="quick-action-label">处理回修</div>
+          <div class="quick-action-sub">审稿意见智能回复</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">📋</span>近期项目</div>
+        <table class="data-table recent-table">
+          <thead>
+            <tr>
+              <th>项目名称</th><th>类型</th><th>当前阶段</th><th>进度</th><th>更新时间</th><th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>高血压合并糖尿病患者心血管事件预测模型</td>
+              <td><span class="tag tag-blue">临床研究</span></td>
+              <td>数据清洗</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div class="progress-bar" style="width:80px"><div class="progress-fill" style="width:60%"></div></div>
+                  <span style="font-size:11px;color:var(--muted)">60%</span>
+                </div>
+              </td>
+              <td style="color:var(--muted)">今天</td>
+              <td><button class="btn btn-secondary btn-sm" onclick="showPanel('clean')">继续</button></td>
+            </tr>
+            <tr>
+              <td>PD-1抑制剂在晚期非小细胞肺癌中的疗效分析</td>
+              <td><span class="tag tag-orange">回顾性研究</span></td>
+              <td>论文写作</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div class="progress-bar" style="width:80px"><div class="progress-fill" style="width:80%"></div></div>
+                  <span style="font-size:11px;color:var(--muted)">80%</span>
+                </div>
+              </td>
+              <td style="color:var(--muted)">昨天</td>
+              <td><button class="btn btn-secondary btn-sm" onclick="showPanel('write')">继续</button></td>
+            </tr>
+            <tr>
+              <td>二甲双胍对结直肠癌预防作用的Meta分析</td>
+              <td><span class="tag tag-green">Meta分析</span></td>
+              <td>审稿回修</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div class="progress-bar" style="width:80px"><div class="progress-fill" style="width:90%"></div></div>
+                  <span style="font-size:11px;color:var(--muted)">90%</span>
+                </div>
+              </td>
+              <td style="color:var(--muted)">2天前</td>
+              <td><button class="btn btn-primary btn-sm" onclick="showPanel('revise')">回修</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ LITERATURE ══ -->
+    <div class="panel" id="panel-literature">
+      <div class="page-header">
+        <div class="page-title">📖 文献解读</div>
+        <div class="page-desc">上传PDF文献，AI自动提炼研究目的、方法、结论，生成结构化摘要</div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-title">上传文献</div>
+            <div style="border:2px dashed var(--border);border-radius:4px;padding:32px;text-align:center;background:var(--cream);cursor:pointer;" onclick="simulateLitUpload()">
+              <div style="font-size:32px;margin-bottom:8px">📄</div>
+              <div style="font-weight:500;margin-bottom:4px">拖拽PDF文件或点击上传</div>
+              <div style="font-size:12px;color:var(--muted)">支持PubMed、CNKI文献 · 最大50MB · 数据加密传输</div>
+            </div>
+            <div style="margin-top:12px;">
+              <div class="form-label">或粘贴文献摘要 <span>（支持英文/中文）</span></div>
+              <textarea id="litAbstract" placeholder="粘贴文献摘要内容..." style="min-height:80px"></textarea>
+            </div>
+            <div class="form-group" style="margin-top:12px;">
+              <div class="form-label">解读侧重点 <span>（可多选）</span></div>
+              <div class="chips">
+                <div class="chip selected">研究方法</div>
+                <div class="chip selected">核心结论</div>
+                <div class="chip">统计分析</div>
+                <div class="chip">局限性</div>
+                <div class="chip">创新点</div>
+                <div class="chip">临床意义</div>
+              </div>
+            </div>
+            <div class="section-actions">
+              <button class="btn btn-primary" onclick="runLiterature()">
+                <span>🤖</span> AI解读文献
+              </button>
+              <button class="btn btn-secondary">清空</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-2">
+          <div class="card">
+            <div class="ai-label">AI 解读结果</div>
+            <div class="ai-output" id="lit-output">
+              <span style="color:var(--muted);font-style:italic">上传文献或粘贴摘要后，点击"AI解读文献"</span>
+            </div>
+          </div>
+          <div class="card" id="lit-extra" style="display:none">
+            <div class="card-title">📌 关键信息提取</div>
+            <table class="data-table">
+              <tr><th style="width:120px">研究设计</th><td id="le-design">—</td></tr>
+              <tr><th>样本量</th><td id="le-sample">—</td></tr>
+              <tr><th>主要终点</th><td id="le-endpoint">—</td></tr>
+              <tr><th>主要结论</th><td id="le-conclusion">—</td></tr>
+              <tr><th>证据等级</th><td id="le-level">—</td></tr>
+            </table>
+            <div class="section-actions" style="margin-top:12px">
+              <button class="btn btn-secondary btn-sm" onclick="showPanel('topic')">→ 用于选题</button>
+              <button class="btn btn-secondary btn-sm">📋 复制摘要</button>
+              <button class="btn btn-secondary btn-sm">💾 保存到文献库</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TOPIC ══ -->
+    <div class="panel" id="panel-topic">
+      <div class="page-header">
+        <div class="page-title">🔭 科研选题</div>
+        <div class="page-desc">基于研究领域、医院资源和发表目标，AI推荐可行选题方向</div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-title">研究背景信息</div>
+            <div class="form-group">
+              <label class="form-label">研究领域 <span>（必填）</span></label>
+              <input type="text" id="topicField" placeholder="例：心血管疾病、肿瘤免疫治疗、糖尿病并发症...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">可用资源与条件</label>
+              <textarea id="topicResource" placeholder="例：病例数量约500例、已有血液样本、随访时间3年、有生信分析平台..." style="min-height:70px"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">目标期刊类型</label>
+              <select id="topicJournal">
+                <option>SCI期刊（IF 3-5分）</option>
+                <option>SCI期刊（IF 5分以上）</option>
+                <option>中华系列期刊</option>
+                <option>国内核心期刊</option>
+                <option>不限</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">研究类型偏好</label>
+              <div class="chips" id="topicTypeChips">
+                <div class="chip selected" onclick="toggleChip(this)">回顾性研究</div>
+                <div class="chip" onclick="toggleChip(this)">前瞻性队列</div>
+                <div class="chip" onclick="toggleChip(this)">RCT</div>
+                <div class="chip" onclick="toggleChip(this)">Meta分析</div>
+                <div class="chip" onclick="toggleChip(this)">真实世界</div>
+                <div class="chip" onclick="toggleChip(this)">基础研究</div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="runTopic()">
+              <span>✨</span> AI生成选题建议
+            </button>
+          </div>
+        </div>
+        <div class="col-2">
+          <div class="card">
+            <div class="ai-label">AI 选题推荐</div>
+            <div class="ai-output" id="topic-output">
+              <span style="color:var(--muted);font-style:italic">填写研究背景信息后，点击"AI生成选题建议"</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ RWE ══ -->
+    <div class="panel" id="panel-rwe">
+      <div class="page-header">
+        <div class="page-title">🌐 真实世界研究选题</div>
+        <div class="page-desc">基于HIS/EMR数据特征，推荐真实世界研究方向与可行性分析</div>
+      </div>
+      <div class="card">
+        <div class="card-title">数据来源描述</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">数据类型</label>
+            <select><option>电子病历（EMR）</option><option>HIS系统数据</option><option>医保数据库</option><option>注册登记研究</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">时间跨度</label>
+            <input type="text" placeholder="例：2015-2023年">
+          </div>
+          <div class="form-group">
+            <label class="form-label">样本量（估计）</label>
+            <input type="text" placeholder="例：约3000例">
+          </div>
+          <div class="form-group">
+            <label class="form-label">疾病诊断编码</label>
+            <input type="text" placeholder="例：ICD-10 I10-I15 高血压">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">可获取变量（数据字段）</label>
+          <textarea placeholder="例：年龄、性别、用药记录、实验室检查（血脂、血糖、肌酐）、住院天数、随访结局..."></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="runRwe()">🤖 AI生成RWE选题</button>
+      </div>
+      <div class="card">
+        <div class="ai-label">AI 真实世界研究建议</div>
+        <div class="ai-output" id="rwe-output"><span style="color:var(--muted);font-style:italic">描述您的数据特征后，点击生成选题建议</span></div>
+      </div>
+    </div>
+
+    <!-- ══ PROSPECT ══ -->
+    <div class="panel" id="panel-prospect">
+      <div class="page-header">
+        <div class="page-title">📊 发表前景评估</div>
+        <div class="page-desc">输入研究摘要或设计，AI评估发表可行性并推荐目标期刊</div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="form-group">
+              <label class="form-label">研究摘要或设计说明</label>
+              <textarea id="prospectInput" placeholder="粘贴您的研究摘要或研究设计简述..." style="min-height:160px"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">期望发表方向</label>
+              <div class="chips">
+                <div class="chip selected">SCI国际期刊</div>
+                <div class="chip">中华系列</div>
+                <div class="chip">国内核心</div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="runProspect()">📊 评估发表前景</button>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <div class="ai-label">发表前景评估报告</div>
+            <div class="ai-output" id="prospect-output"><span style="color:var(--muted);font-style:italic">输入研究内容后开始评估</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ EDC ══ -->
+    <div class="panel" id="panel-edc">
+      <div class="page-header">
+        <div class="page-title">🗂️ EDC 电子数据采集</div>
+        <div class="page-desc">在线设计病例报告表（CRF），安全采集与存储研究数据</div>
+      </div>
+      <div class="alert alert-warn">
+        ⚠️ 数据安全提示：本平台采用AES-256加密存储，所有数据在导出前自动脱敏处理，符合《数据安全法》与医疗数据保护规范。
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'edc-design')">表单设计</div>
+        <div class="tab" onclick="switchTab(this,'edc-entry')">数据录入</div>
+        <div class="tab" onclick="switchTab(this,'edc-view')">数据查看</div>
+      </div>
+      <div id="edc-design">
+        <div class="row">
+          <div class="col">
+            <div class="card">
+              <div class="card-title">AI辅助生成CRF表</div>
+              <div class="form-group">
+                <label class="form-label">研究类型</label>
+                <select id="edcType">
+                  <option>临床试验</option><option>队列研究</option><option>横断面研究</option><option>病例对照</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">主要研究内容</label>
+                <textarea id="edcContent" placeholder="例：高血压患者服用ACEI后肾功能变化，需采集基线血压、用药情况、肌酐、尿蛋白等..." style="min-height:80px"></textarea>
+              </div>
+              <button class="btn btn-primary btn-full" onclick="genCRF()">🤖 AI生成CRF模板</button>
+            </div>
+          </div>
+          <div class="col-2">
+            <div class="card">
+              <div class="card-title">CRF 表单预览</div>
+              <div id="crf-preview">
+                <div style="color:var(--muted);font-style:italic;font-size:13px">点击"AI生成CRF模板"后在此预览表单结构</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="edc-entry" style="display:none">
+        <div class="card">
+          <div class="card-title">录入病例数据</div>
+          <div class="alert alert-info">🔒 所有录入数据实时加密，患者姓名、身份证号等敏感信息将自动脱敏替换</div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">病例编号 <span>（系统自动生成，不含患者真实ID）</span></label>
+              <input type="text" value="CASE-2024-0089" readonly style="background:#f0f0ee">
+            </div>
+            <div class="form-group">
+              <label class="form-label">入组日期</label>
+              <input type="text" placeholder="YYYY-MM-DD">
+            </div>
+            <div class="form-group">
+              <label class="form-label">年龄</label>
+              <input type="text" placeholder="岁">
+            </div>
+            <div class="form-group">
+              <label class="form-label">性别</label>
+              <select><option>男</option><option>女</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">收缩压（mmHg）</label>
+              <input type="text" placeholder="基线值">
+            </div>
+            <div class="form-group">
+              <label class="form-label">舒张压（mmHg）</label>
+              <input type="text" placeholder="基线值">
+            </div>
+            <div class="form-group">
+              <label class="form-label">血肌酐（μmol/L）</label>
+              <input type="text" placeholder="基线值">
+            </div>
+            <div class="form-group">
+              <label class="form-label">用药情况</label>
+              <input type="text" placeholder="药名、剂量、疗程">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="alert('数据已安全保存（演示模式）')">💾 保存本条记录</button>
+        </div>
+      </div>
+      <div id="edc-view" style="display:none">
+        <div class="card">
+          <div class="card-title">已录入数据（演示数据，已脱敏）</div>
+          <table class="data-table">
+            <thead><tr><th>编号</th><th>年龄</th><th>性别</th><th>收缩压</th><th>舒张压</th><th>肌酐</th><th>状态</th></tr></thead>
+            <tbody>
+              <tr><td>CASE-0001</td><td>58</td><td>男</td><td>152</td><td>92</td><td>89</td><td><span class="tag tag-green">完整</span></td></tr>
+              <tr><td>CASE-0002</td><td>63</td><td>女</td><td>168</td><td>98</td><td>102</td><td><span class="tag tag-green">完整</span></td></tr>
+              <tr><td>CASE-0003</td><td>45</td><td>男</td><td>145</td><td>88</td><td>—</td><td><span class="tag tag-orange">缺失</span></td></tr>
+              <tr><td>CASE-0004</td><td>72</td><td>女</td><td>175</td><td>105</td><td>134</td><td><span class="tag tag-green">完整</span></td></tr>
+            </tbody>
+          </table>
+          <div class="section-actions" style="margin-top:12px">
+            <button class="btn btn-secondary btn-sm" onclick="showPanel('clean')">→ 进入数据清洗</button>
+            <button class="btn btn-secondary btn-sm">📥 导出脱敏Excel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CLEAN ══ -->
+    <div class="panel" id="panel-clean">
+      <div class="page-header">
+        <div class="page-title">🧹 数据清洗</div>
+        <div class="page-desc">AI自动识别缺失值、异常值、重复记录，生成清洗报告</div>
+      </div>
+      <div class="card">
+        <div class="card-title">数据质量检查</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+          <div style="text-align:center;padding:14px;background:var(--cream);border-radius:4px;">
+            <div style="font-size:22px;font-weight:700;color:var(--ink)">247</div>
+            <div style="font-size:11px;color:var(--muted)">总记录数</div>
+          </div>
+          <div style="text-align:center;padding:14px;background:#fef2f2;border-radius:4px;">
+            <div style="font-size:22px;font-weight:700;color:#dc2626">23</div>
+            <div style="font-size:11px;color:#dc2626">缺失值</div>
+          </div>
+          <div style="text-align:center;padding:14px;background:var(--warn);border-radius:4px;">
+            <div style="font-size:22px;font-weight:700;color:#c2410c">7</div>
+            <div style="font-size:11px;color:#c2410c">异常值</div>
+          </div>
+          <div style="text-align:center;padding:14px;background:#f0fdf4;border-radius:4px;">
+            <div style="font-size:22px;font-weight:700;color:#16a34a">2</div>
+            <div style="font-size:11px;color:#16a34a">重复记录</div>
+          </div>
+        </div>
+        <div class="ai-label" style="margin-bottom:8px">AI 数据质量分析</div>
+        <div class="ai-output" id="clean-report">
+          <div style="color:var(--muted)">点击下方按钮，AI将自动扫描数据质量问题并给出处理建议...</div>
+        </div>
+        <div class="section-actions">
+          <button class="btn btn-primary" onclick="runClean()">🔍 AI数据质检</button>
+          <button class="btn btn-secondary" onclick="runImpute()">🔧 一键智能填补</button>
+          <button class="btn btn-secondary btn-sm" onclick="showPanel('stats')">→ 进入统计分析</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STATS ══ -->
+    <div class="panel" id="panel-stats">
+      <div class="page-header">
+        <div class="page-title">📈 统计分析</div>
+        <div class="page-desc">用自然语言描述分析需求，AI自动选择统计方法并生成结果</div>
+      </div>
+      <div class="card">
+        <div class="card-title">分析需求描述</div>
+        <div class="form-group">
+          <label class="form-label">用自然语言描述您的分析问题 <span>（无需掌握统计学）</span></label>
+          <textarea id="statsQuery" placeholder="例：比较高血压组和正常组之间的肌酐水平差异，并检验两组在年龄、性别方面是否均衡..." style="min-height:80px"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">快速选择常用分析</label>
+          <div class="chips">
+            <div class="chip" onclick="setStatsQuery('对比两组基线特征，生成Table 1')">基线特征比较</div>
+            <div class="chip" onclick="setStatsQuery('进行单因素及多因素Logistic回归分析')">Logistic回归</div>
+            <div class="chip" onclick="setStatsQuery('绘制Kaplan-Meier生存曲线并进行Log-rank检验')">生存分析KM曲线</div>
+            <div class="chip" onclick="setStatsQuery('进行Cox比例风险回归分析')">Cox回归</div>
+            <div class="chip" onclick="setStatsQuery('计算各变量的Spearman相关系数')">相关性分析</div>
+            <div class="chip" onclick="setStatsQuery('进行亚组分析并绘制Forest plot')">亚组分析</div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="runStats()">📊 生成统计分析</button>
+      </div>
+      <div class="card" id="stats-result" style="display:none">
+        <div class="ai-label">AI 统计分析结果</div>
+        <div class="ai-output" id="stats-output"></div>
+        <div class="divider"></div>
+        <div class="card-title">📋 Table 1 — 基线特征比较（演示）</div>
+        <table class="data-table">
+          <thead>
+            <tr><th>变量</th><th>高血压组 (n=124)</th><th>对照组 (n=123)</th><th>P值</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>年龄（岁，均数±标准差）</td><td>62.3 ± 10.1</td><td>60.8 ± 9.7</td><td>0.231</td></tr>
+            <tr><td>男性，n（%）</td><td>68（54.8%）</td><td>65（52.8%）</td><td>0.752</td></tr>
+            <tr><td>BMI（kg/m²）</td><td>26.4 ± 3.2</td><td>24.9 ± 2.8</td><td>0.012*</td></tr>
+            <tr><td>收缩压（mmHg）</td><td>158.2 ± 15.6</td><td>121.3 ± 10.2</td><td>&lt;0.001***</td></tr>
+            <tr><td>肌酐（μmol/L）</td><td>101.3 ± 28.4</td><td>83.2 ± 18.7</td><td>&lt;0.001***</td></tr>
+          </tbody>
+        </table>
+        <div class="section-actions">
+          <button class="btn btn-secondary btn-sm" onclick="showPanel('write')">→ 结果写入论文</button>
+          <button class="btn btn-secondary btn-sm">📥 导出Excel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ WRITE ══ -->
+    <div class="panel" id="panel-write">
+      <div class="page-header">
+        <div class="page-title">✍️ AI论文撰写</div>
+        <div class="page-desc">结构化输入研究信息，AI辅助生成各章节内容</div>
+      </div>
+      <div class="steps">
+        <div class="step done" id="ws1">
+          <div class="step-num">✓</div>
+          <div class="step-label">基本信息</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step active" id="ws2">
+          <div class="step-num">2</div>
+          <div class="step-label">选择章节</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="ws3">
+          <div class="step-num">3</div>
+          <div class="step-label">生成内容</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="ws4">
+          <div class="step-num">4</div>
+          <div class="step-label">编辑导出</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-title">论文基本信息</div>
+            <div class="form-group">
+              <label class="form-label">研究题目</label>
+              <input type="text" id="writeTitle" placeholder="例：高血压合并糖尿病患者血管紧张素转化酶抑制剂对肾功能的保护作用">
+            </div>
+            <div class="form-group">
+              <label class="form-label">目标期刊</label>
+              <input type="text" id="writeJournal" placeholder="例：Journal of Hypertension, 中华高血压杂志">
+            </div>
+            <div class="form-group">
+              <label class="form-label">核心发现（简述）</label>
+              <textarea id="writeFindings" placeholder="例：ACEI组24周肌酐水平较基线下降12.3%，显著优于对照组（P<0.001）..." style="min-height:70px"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">需生成的章节</label>
+              <div class="chips" id="sectionChips">
+                <div class="chip selected" onclick="toggleChip(this)">摘要Abstract</div>
+                <div class="chip selected" onclick="toggleChip(this)">前言Introduction</div>
+                <div class="chip" onclick="toggleChip(this)">方法Methods</div>
+                <div class="chip" onclick="toggleChip(this)">结果Results</div>
+                <div class="chip selected" onclick="toggleChip(this)">讨论Discussion</div>
+                <div class="chip" onclick="toggleChip(this)">结论Conclusion</div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="runWrite()">✍️ AI生成论文内容</button>
+          </div>
+        </div>
+        <div class="col-2">
+          <div class="card">
+            <div class="ai-label">AI 生成论文内容</div>
+            <div class="ai-output" id="write-output" style="min-height:300px">
+              <span style="color:var(--muted);font-style:italic">填写论文基本信息后，点击生成</span>
+            </div>
+          </div>
+          <div class="section-actions">
+            <button class="btn btn-secondary btn-sm" onclick="showPanel('rewrite')">→ 段落润色</button>
+            <button class="btn btn-secondary btn-sm" onclick="showPanel('refs')">→ 匹配参考文献</button>
+            <button class="btn btn-secondary btn-sm">📄 导出Word</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ REWRITE ══ -->
+    <div class="panel" id="panel-rewrite">
+      <div class="page-header">
+        <div class="page-title">🔄 段落改写润色</div>
+        <div class="page-desc">中英文段落改写、学术化润色、降重</div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="form-group">
+              <label class="form-label">原始段落 <span>（支持中英文）</span></label>
+              <textarea id="rewriteInput" placeholder="粘贴需要润色或改写的段落..." style="min-height:160px"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">改写模式</label>
+              <div class="chips" id="rewriteMode">
+                <div class="chip selected" onclick="selectRewriteMode(this)">学术化润色</div>
+                <div class="chip" onclick="selectRewriteMode(this)">降重改写</div>
+                <div class="chip" onclick="selectRewriteMode(this)">英文翻译</div>
+                <div class="chip" onclick="selectRewriteMode(this)">中文翻译</div>
+                <div class="chip" onclick="selectRewriteMode(this)">简洁精炼</div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="runRewrite()">🔄 AI改写</button>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <div class="ai-label">改写结果</div>
+            <div class="ai-output" id="rewrite-output" style="min-height:200px">
+              <span style="color:var(--muted);font-style:italic">输入段落后点击改写</span>
+            </div>
+            <div class="section-actions" style="margin-top:10px">
+              <button class="btn btn-secondary btn-sm">📋 复制结果</button>
+              <button class="btn btn-secondary btn-sm" onclick="runRewrite()">🔁 重新生成</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ REFS ══ -->
+    <div class="panel" id="panel-refs">
+      <div class="page-header">
+        <div class="page-title">🔗 文献匹配</div>
+        <div class="page-desc">根据段落内容，AI推荐匹配的参考文献</div>
+      </div>
+      <div class="card">
+        <div class="form-group">
+          <label class="form-label">粘贴论文段落（需要引用的部分）</label>
+          <textarea id="refsInput" placeholder="粘贴您的段落内容，AI将推荐相关文献..." style="min-height:120px"></textarea>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">检索范围</label>
+            <select><option>PubMed + 中文数据库</option><option>仅PubMed</option><option>仅中文文献</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">引用格式</label>
+            <select><option>Vancouver（序号）</option><option>APA第7版</option><option>GB/T 7714-2015</option></select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="runRefs()">🔍 AI匹配参考文献</button>
+      </div>
+      <div class="card" id="refs-result" style="display:none">
+        <div class="card-title">📚 推荐参考文献</div>
+        <div class="ai-output" id="refs-output"></div>
+      </div>
+    </div>
+
+    <!-- ══ REVISE ══ -->
+    <div class="panel" id="panel-revise">
+      <div class="page-header">
+        <div class="page-title">✉️ 审稿意见回复</div>
+        <div class="page-desc">粘贴审稿意见，AI逐条分析并生成修改策略与回复信</div>
+      </div>
+      <div class="alert alert-warn">
+        📋 待处理：《二甲双胍对结直肠癌预防作用的Meta分析》审稿意见已收到，共 3 位审稿人意见
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="form-group">
+              <label class="form-label">原始论文摘要/内容 <span>（用于AI理解研究背景）</span></label>
+              <textarea id="reviseManuscript" placeholder="粘贴论文摘要或相关章节内容..." style="min-height:80px"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">审稿意见 <span>（完整粘贴，支持多位审稿人）</span></label>
+              <textarea id="reviseComments" placeholder="例：&#10;Reviewer 1:&#10;1. 研究的纳入标准不够清晰，请详细说明...&#10;2. 异质性分析结果（I²=67%）较高，请讨论可能原因...&#10;&#10;Reviewer 2:&#10;1. 请提供漏斗图以评估发表偏倚..." style="min-height:160px"></textarea>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="runRevise()">🤖 AI生成回复策略</button>
+          </div>
+        </div>
+        <div class="col-2">
+          <div class="card">
+            <div class="ai-label">AI 审稿回复建议</div>
+            <div class="ai-output" id="revise-output" style="min-height:300px">
+              <span style="color:var(--muted);font-style:italic">粘贴审稿意见后，AI将逐条给出回复策略与修改建议</span>
+            </div>
+          </div>
+          <div class="section-actions">
+            <button class="btn btn-secondary btn-sm">📄 生成完整回复信Word</button>
+            <button class="btn btn-secondary btn-sm" onclick="showPanel('write')">→ 修改论文对应章节</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ─── NAVIGATION ───────────────────────────────────────────────
+const panelMeta = {
+  home: ['工作台', '首页概览'],
+  literature: ['选题模块', '文献解读'],
+  topic: ['选题模块', '科研选题'],
+  rwe: ['选题模块', '真实世界研究'],
+  prospect: ['选题模块', '发表前景评估'],
+  edc: ['数据模块', 'EDC数据采集'],
+  clean: ['数据模块', '数据清洗'],
+  stats: ['数据模块', '统计分析'],
+  write: ['写作模块', '论文撰写'],
+  rewrite: ['写作模块', '段落改写润色'],
+  refs: ['写作模块', '文献匹配'],
+  revise: ['回修模块', '审稿意见回复'],
+};
+
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(item => {
+    if (item.getAttribute('onclick') && item.getAttribute('onclick').includes("'" + id + "'")) {
+      item.classList.add('active');
+    }
+  });
+  const meta = panelMeta[id] || ['工作台', id];
+  document.getElementById('breadcrumb').innerHTML =
+    `<span>${meta[0]}</span><span>›</span><strong>${meta[1]}</strong>`;
+}
+
+function switchTab(el, targetId) {
+  el.closest('.card, .main, .panel').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['edc-design','edc-entry','edc-view'].forEach(id => {
+    const el2 = document.getElementById(id);
+    if(el2) el2.style.display = id === targetId ? 'block' : 'none';
+  });
+}
+
+function toggleChip(el) { el.classList.toggle('selected'); }
+function selectRewriteMode(el) {
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ─── ANTHROPIC API CALL ───────────────────────────────────────
+async function callClaude(systemPrompt, userPrompt, outputId, onDone) {
+  const el = document.getElementById(outputId);
+  el.innerHTML = '<span class="spinner"></span> <span style="color:var(--muted)">AI分析中，请稍候...</span>';
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
+      })
+    });
+    const data = await resp.json();
+    const text = (data.content || []).map(b => b.text || '').join('');
+    el.innerHTML = text.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+    if (onDone) onDone(text);
+  } catch(e) {
+    el.innerHTML = '<span style="color:#dc2626">⚠ 网络请求失败，请检查网络连接</span>';
+  }
+}
+
+// ─── LITERATURE ───────────────────────────────────────────────
+function simulateLitUpload() {
+  document.getElementById('litAbstract').value = `Background: Angiotensin-converting enzyme inhibitors (ACEIs) are widely used in hypertensive patients with diabetic nephropathy. However, their renoprotective effects in Asian populations remain unclear.
+Methods: We conducted a retrospective cohort study of 247 hypertensive patients with type 2 diabetes. Patients were divided into ACEI group (n=124) and control group (n=123). Primary outcome was change in serum creatinine at 24 weeks.
+Results: ACEI group showed a 12.3% reduction in creatinine (P<0.001). Multivariate analysis identified ACEI use as an independent protective factor (OR=0.42, 95%CI: 0.28-0.63).
+Conclusion: ACEIs demonstrated significant renoprotective effects in Chinese hypertensive diabetic patients.`;
+}
+
+function runLiterature() {
+  const text = document.getElementById('litAbstract').value.trim();
+  if (!text) { alert('请先粘贴文献摘要或上传文献'); return; }
+
+  const sys = `你是一位医学文献分析专家，擅长提炼医学研究的核心信息。请用中文、结构化地解读医学文献。`;
+  const usr = `请解读以下医学文献摘要，用中文输出：
+1. 研究背景与目的（1-2句）
+2. 研究设计与方法
+3. 主要结果（含关键数据）
+4. 核心结论
+5. 研究局限性与临床意义
+
+文献内容：${text}`;
+
+  callClaude(sys, usr, 'lit-output', (result) => {
+    document.getElementById('lit-extra').style.display = 'block';
+    document.getElementById('le-design').textContent = '回顾性队列研究';
+    document.getElementById('le-sample').textContent = '247例（ACEI组124例，对照组123例）';
+    document.getElementById('le-endpoint').textContent = '24周血清肌酐变化';
+    document.getElementById('le-conclusion').textContent = 'ACEI对中国高血压糖尿病患者具有显著肾保护作用';
+    document.getElementById('le-level').textContent = 'Level IIb — 回顾性队列';
+  });
+}
+
+// ─── TOPIC ────────────────────────────────────────────────────
+function runTopic() {
+  const field = document.getElementById('topicField').value.trim() || '心血管疾病';
+  const resource = document.getElementById('topicResource').value.trim() || '500例病例资源';
+  const journal = document.getElementById('topicJournal').value;
+
+  const sys = `你是医学科研导师，精通临床研究选题。请为临床医生提供具体、可行的科研选题建议。`;
+  const usr = `请根据以下条件，推荐3-5个具体的科研选题方向：
+- 研究领域：${field}
+- 可用资源：${resource}
+- 目标期刊：${journal}
+
+每个选题请包含：
+① 具体题目（可直接用作论文标题）
+② 研究意义（1句话）
+③ 可行性分析
+④ 预期发表期刊推荐`;
+
+  callClaude(sys, usr, 'topic-output');
+}
+
+// ─── RWE ──────────────────────────────────────────────────────
+function runRwe() {
+  const sys = `你是真实世界研究方法学专家，熟悉中国医疗数据库特征。`;
+  const usr = `我有一批电子病历数据（EMR），时间跨度约8年，约3000例心血管患者，含用药记录、实验室检查、住院记录等变量。请推荐3个适合发表SCI（IF>3）的真实世界研究选题，每个选题包含：研究假设、研究设计、关键变量选择、预期研究结果方向。`;
+  callClaude(sys, usr, 'rwe-output');
+}
+
+// ─── PROSPECT ─────────────────────────────────────────────────
+function runProspect() {
+  const text = document.getElementById('prospectInput').value.trim() || '高血压合并糖尿病患者ACEI治疗对肾功能保护作用的回顾性队列研究，247例，随访24周，主要结果显著（P<0.001）';
+  const sys = `你是医学期刊编辑，有丰富的审稿经验，熟悉SCI期刊选稿标准。`;
+  const usr = `请评估以下研究的发表前景，并给出具体建议：
+
+研究内容：${text}
+
+请包含：
+1. 综合发表前景评分（1-10分）及理由
+2. 研究的亮点与优势
+3. 主要不足与风险
+4. 推荐投稿期刊（3-5个，含影响因子）
+5. 提升发表可能性的具体建议`;
+  callClaude(sys, usr, 'prospect-output');
+}
+
+// ─── EDC ──────────────────────────────────────────────────────
+function genCRF() {
+  const type = document.getElementById('edcType').value;
+  const content = document.getElementById('edcContent').value.trim() || '高血压患者ACEI治疗效果研究';
+
+  const preview = document.getElementById('crf-preview');
+  preview.innerHTML = '<span class="spinner"></span> AI正在生成CRF表单结构...';
+
+  setTimeout(() => {
+    preview.innerHTML = `
+    <div style="font-size:12px">
+      <div style="font-weight:600;margin-bottom:10px;color:var(--accent)">📋 AI生成的CRF表结构 — ${type}</div>
+      <div style="border:1px solid var(--border);border-radius:2px;overflow:hidden">
+        <div style="background:var(--accent);color:#fff;padding:8px 12px;font-weight:600">模块一：患者基本信息</div>
+        <div style="padding:10px 12px;background:var(--cream);font-size:11px;line-height:2">
+          病例编号（自动）• 入组日期 • 年龄 • 性别 • 身高/体重/BMI
+        </div>
+        <div style="background:var(--accent);color:#fff;padding:8px 12px;font-weight:600">模块二：诊断与病史</div>
+        <div style="padding:10px 12px;font-size:11px;line-height:2">
+          高血压诊断年限 • 糖尿病病史 • 合并症 • 家族史
+        </div>
+        <div style="background:var(--accent);color:#fff;padding:8px 12px;font-weight:600">模块三：基线检查</div>
+        <div style="padding:10px 12px;background:var(--cream);font-size:11px;line-height:2">
+          收缩压/舒张压 • 心率 • 血肌酐 • 尿蛋白定量 • 血糖/HbA1c • 血脂四项
+        </div>
+        <div style="background:var(--accent);color:#fff;padding:8px 12px;font-weight:600">模块四：用药记录</div>
+        <div style="padding:10px 12px;font-size:11px;line-height:2">
+          药物名称 • 剂量 • 给药途径 • 开始/结束日期 • 依从性评估
+        </div>
+        <div style="background:var(--accent);color:#fff;padding:8px 12px;font-weight:600">模块五：随访结局</div>
+        <div style="padding:10px 12px;background:var(--cream);font-size:11px;line-height:2">
+          随访时间点（4/12/24周）• 各时点实验室复查 • 不良事件 • 退出原因
+        </div>
+      </div>
+      <div class="section-actions" style="margin-top:10px">
+        <button class="btn btn-primary btn-sm" onclick="switchTab(document.querySelectorAll('.tab')[1],'edc-entry')">→ 开始录入数据</button>
+        <button class="btn btn-secondary btn-sm">📥 导出Excel模板</button>
+      </div>
+    </div>`;
+  }, 1800);
+}
+
+// ─── CLEAN ────────────────────────────────────────────────────
+function runClean() {
+  const sys = `你是生物统计学专家，擅长临床数据质量控制。`;
+  const usr = `我的临床研究数据集（247条记录）存在以下问题：
+- 23个缺失值（主要集中在肌酐、尿蛋白变量，占9.3%）
+- 7个异常值（收缩压最大值为280mmHg，血肌酐最大值为650μmol/L）
+- 2条重复记录
+
+请提供：
+1. 各类问题的处理策略与统计学依据
+2. 多重插补 vs 删除法的适用条件分析
+3. 处理后数据质量评估建议
+4. 在论文Methods部分如何规范描述数据清洗过程`;
+  callClaude(sys, usr, 'clean-report');
+}
+
+function runImpute() {
+  const el = document.getElementById('clean-report');
+  el.innerHTML = '<span class="spinner"></span> 执行多重插补（MICE算法）...';
+  setTimeout(() => {
+    el.innerHTML = `<strong>✅ 数据清洗完成</strong><br><br>
+已处理：<br>
+• <strong>缺失值</strong>：采用多重插补（m=5次），基于年龄、性别、BMI、血压等变量<br>
+• <strong>异常值</strong>：280mmHg收缩压已标记为离群值，建议原始数据核实；650μmol/L肌酐记录为真实值（重度CKD患者）<br>
+• <strong>重复记录</strong>：2条重复已合并（保留首次记录）<br><br>
+清洗后：<strong>245条有效记录</strong>，数据完整率 98.2%，可进入统计分析。`;
+  }, 2000);
+}
+
+// ─── STATS ────────────────────────────────────────────────────
+function setStatsQuery(text) { document.getElementById('statsQuery').value = text; }
+
+function runStats() {
+  const query = document.getElementById('statsQuery').value.trim() || '比较两组基线特征差异';
+  const sys = `你是临床生物统计专家，熟悉医学论文统计分析规范。`;
+  const usr = `请针对以下分析需求，给出：
+1. 推荐的统计方法及理由
+2. 统计软件实现步骤（R/SPSS/Stata）
+3. 结果如何在论文中规范报告
+4. 常见统计错误提示
+
+分析需求：${query}
+数据背景：高血压合并糖尿病患者队列，247例，含基线血压、肌酐、血糖等连续变量及分类变量`;
+  document.getElementById('stats-result').style.display = 'block';
+  callClaude(sys, usr, 'stats-output');
+}
+
+// ─── WRITE ────────────────────────────────────────────────────
+function runWrite() {
+  const title = document.getElementById('writeTitle').value.trim() || '高血压合并糖尿病患者ACEI治疗肾功能保护作用研究';
+  const journal = document.getElementById('writeJournal').value.trim() || 'SCI期刊';
+  const findings = document.getElementById('writeFindings').value.trim() || 'ACEI组肌酐下降12.3%（P<0.001）';
+
+  const sys = `你是医学论文写作专家，熟悉SCI期刊投稿规范。请生成规范、严谨、符合期刊要求的医学论文内容。`;
+  const usr = `请为以下研究生成论文核心章节（中文），包含摘要、前言和讨论部分：
+
+研究题目：${title}
+目标期刊：${journal}
+核心发现：${findings}
+研究设计：回顾性队列研究，247例高血压合并2型糖尿病患者，随访24周
+
+要求：
+- 摘要：结构化（背景/目的/方法/结果/结论）约250字
+- 前言：3段，交代研究背景、研究空白、研究目的
+- 讨论：4段，解释结果、比较既往研究、局限性、结论`;
+  callClaude(sys, usr, 'write-output');
+}
+
+// ─── REWRITE ──────────────────────────────────────────────────
+function runRewrite() {
+  const text = document.getElementById('rewriteInput').value.trim() || '本研究发现ACEI药物对高血压糖尿病患者的肾功能有保护作用，治疗后肌酐水平明显下降，说明这类药物效果很好。';
+  const mode = document.querySelector('#rewriteMode .chip.selected')?.textContent || '学术化润色';
+
+  const sys = `你是医学论文写作专家，擅长学术中文写作规范化改写。`;
+  const usr = `请对以下段落进行"${mode}"处理，保持原意，提升学术规范性：
+
+原文：${text}
+
+要求：
+1. 改写后的内容
+2. 主要改动说明（列举2-3点）`;
+  callClaude(sys, usr, 'rewrite-output');
+}
+
+// ─── REFS ─────────────────────────────────────────────────────
+function runRefs() {
+  const text = document.getElementById('refsInput').value.trim() || '血管紧张素转化酶抑制剂（ACEI）在高血压合并慢性肾病患者中的肾保护作用已被多项临床研究证实。';
+  const sys = `你是医学文献专家，熟悉PubMed数据库与中文医学文献。`;
+  const usr = `请根据以下论文段落，推荐5-8篇最相关的参考文献（真实文献或高质量示例），Vancouver格式，包含PMID：
+
+段落：${text}
+
+每条文献包含：序号、作者、题目、期刊、年份、页码、简要说明（为何推荐）`;
+
+  document.getElementById('refs-result').style.display = 'block';
+  callClaude(sys, usr, 'refs-output');
+}
+
+// ─── REVISE ───────────────────────────────────────────────────
+function runRevise() {
+  const comments = document.getElementById('reviseComments').value.trim() ||
+    `Reviewer 1:\n1. 纳入排除标准描述不够清晰，请详细说明\n2. 异质性I²=67%较高，请分析原因并进行亚组分析\n\nReviewer 2:\n1. 请提供漏斗图评估发表偏倚\n2. 讨论部分应更充分地讨论本研究与既往Meta分析的差异`;
+
+  const sys = `你是医学期刊投稿专家，有丰富的审稿意见回复经验。`;
+  const usr = `请针对以下审稿意见，逐条给出：
+① 意见分析（审稿人关注的核心问题）
+② 修改策略（如何修改论文）
+③ 回复模板（规范的英文/中文回复示例）
+
+审稿意见：
+${comments}`;
+  callClaude(sys, usr, 'revise-output');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+// Animate progress bars on load
+setTimeout(() => {
+  document.querySelectorAll('.progress-fill').forEach(el => {
+    const w = el.style.width;
+    el.style.width = '0';
+    setTimeout(() => el.style.width = w, 100);
+  });
+}, 300);
+</script>
+</body>
+</html>

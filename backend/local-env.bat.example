@@ -1,0 +1,5 @@
+@echo off
+REM 复制本文件为 local-env.bat（不要提交到 Git），再填写下面两行
+
+set "MYSQL_PORT=3307"
+set "MYSQL_PASSWORD=你的root密码"

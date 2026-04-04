@@ -1,0 +1,25 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="ProgId" content="Word.Document">
+<title>交付步骤与交付物汇总</title>
+</head>
+<body>
+<h1>交付步骤与交付物汇总</h1>
+<h2>交付步骤（概要）</h2>
+<ol>
+<li>克隆代码仓库，配置 <code>ANTHROPIC_API_KEY</code>（可选）。</li>
+<li>本地或 Docker 启动 MySQL 与后端、前端（见 README / DEPLOY）。</li>
+<li>按 DEMO.md 跑通选题→数据→写作→回修闭环。</li>
+<li>导出论文 JSON/XLSX，检查审计与脱敏日志。</li>
+</ol>
+<h2>交付物清单</h2>
+<ul>
+<li>可运行前后端源码与 <code>docker-compose.yml</code></li>
+<li>README.md、DEPLOY.md、DEMO.md、prompt_library.md</li>
+<li>docs/DATABASE_DESIGN.md 与本文档（.doc）</li>
+<li>Swagger 自动生成的 API 文档（运行后访问 /swagger-ui/）</li>
+<li>sample_data 示例数据</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>金融科研 AI — 静态设计说明（正式 UI 在 Vue 工程内）</title>
+  <style>
+    body { font-family: 'Segoe UI', 'PingFang SC', sans-serif; max-width: 720px; margin: 40px auto; line-height: 1.7; color: #0f172a; }
+    code { background: #f1f5f9; padding: 2px 6px; }
+  </style>
+</head>
+<body>
+  <h1>金融科研 AI 辅助平台 — 设计参考</h1>
+  <p>
+    原先根目录的 <code>medical-research-ai.html</code>（医学演示）已由 <strong>Vue 3 单页应用</strong>承接；
+    当前产品为<strong>金融领域</strong>，侧栏 + 纸本底色 + 藏青主色见
+    <code>frontend/src/styles/fin-theme.css</code>。
+  </p>
+  <p>
+    功能结构：<strong>文献与选题</strong>（文献解读 / 科研选题 / 时政选题）→
+    <strong>数据与处理</strong>（EDC、CSMAR/AkShare 说明、清洗与统计、云环境文档）→
+    <strong>论文写作</strong> → <strong>投稿回修</strong> → <strong>合规与文档</strong>。
+  </p>
+  <p>闭环与依赖见 <code>docs/DEV_ENV.md</code>。</p>
+</body>
+</html>

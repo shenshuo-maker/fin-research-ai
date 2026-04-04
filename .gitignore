@@ -1,0 +1,11 @@
+**/target/
+**/node_modules/
+**/dist/
+**/.idea/
+**/*.iml
+**/data/
+.env
+*.log
+backend/local-env.bat
+backend/local-api.bat
+backend/last-backend-run.log

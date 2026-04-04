@@ -1,0 +1,26 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="ProgId" content="Word.Document">
+<title>需求说明书</title>
+</head>
+<body>
+<h1>金融科研 AI 辅助平台 — 需求说明书（MVP）</h1>
+<p><b>版本：</b>0.1 &nbsp; <b>日期：</b>2026</p>
+<h2>1. 背景与目标</h2>
+<p>面向高校与金融机构科研人员，提供云端 SPA，覆盖选题、数据、写作、回修闭环，强调数据脱敏与操作审计。</p>
+<h2>2. 用户角色</h2>
+<p>科研人员（项目所有者）；后续可扩展机构管理员。</p>
+<h2>3. 功能需求摘要</h2>
+<ul>
+<li>文献上传与 AI 解读（脱敏后送模）</li>
+<li>选题生成、时效性选题、发表前景评估</li>
+<li>EDC 表单、字段映射、模拟采集、CSV/Excel 清洗与描述统计/检验/OLS</li>
+<li>论文初稿生成、段落改写、文献匹配、结果解读、JSON/XLSX 导出</li>
+<li>审稿意见解析、修改建议、回复信、论文版本与回滚</li>
+<li>自动文档（需求/选型）与合规日志查询</li>
+</ul>
+<h2>4. 非功能需求</h2>
+<p>HTTPS 部署、密钥与加密存储、API 统一错误码；CSMAR/Akshare 生产对接列为二期。</p>
+</body>
+</html>
