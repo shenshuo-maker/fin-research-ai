@@ -1,5 +1,14 @@
 # 金融科研 AI 辅助平台（MVP）
 
+<p>
+  <img src="https://img.shields.io/badge/Spring_Boot-3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring">
+  <img src="https://img.shields.io/badge/Vue3-TypeScript-42B883?style=for-the-badge&logo=vuedotjs&logoColor=white" alt="Vue">
+  <img src="https://img.shields.io/badge/Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Compose">
+  <img src="https://img.shields.io/badge/安全-JWT_脱敏_审计-1F3B4D?style=for-the-badge" alt="security">
+</p>
+
+> 全栈演示。和 Infra 相关的部分是 **Compose 部署、JWT、脱敏、审计**；业务本身是金融科研辅助。投沙箱/稳定性请看 [sandbench](https://github.com/shenshuo-maker/sandbench)。
+
 中文界面、前后端分离的金融学科研全流程演示系统：选题与文献 → EDC/数据清洗与统计 → 论文写作 → 审稿回修，集成 **Claude API**（可配置）与 **数据脱敏 / 审计** 能力。
 
 ## 技术栈
