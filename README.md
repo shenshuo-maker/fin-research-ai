@@ -1,15 +1,24 @@
-# 金融科研 AI 辅助平台（MVP）
-
-<p>
-  <img src="https://img.shields.io/badge/Spring_Boot-3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring">
-  <img src="https://img.shields.io/badge/Vue3-TypeScript-42B883?style=for-the-badge&logo=vuedotjs&logoColor=white" alt="Vue">
-  <img src="https://img.shields.io/badge/Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Compose">
-  <img src="https://img.shields.io/badge/安全-JWT_脱敏_审计-1F3B4D?style=for-the-badge" alt="security">
+<p align="center">
+  <img src="assets/header.svg" width="960" alt="fin-research: compose, JWT, AES-GCM, audit">
 </p>
 
-> 全栈演示。和 Infra 相关的部分是 **Compose 部署、JWT、脱敏、审计**；业务本身是金融科研辅助。投沙箱/稳定性请看 [sandbench](https://github.com/shenshuo-maker/sandbench)。
+<p align="center">
+  <img src="https://img.shields.io/badge/deploy-Compose-1B3A2F?style=flat-square&labelColor=101614&logo=docker&logoColor=8FD0B0" alt="compose">
+  <img src="https://img.shields.io/badge/auth-JWT-C4A35A?style=flat-square&labelColor=101614" alt="jwt">
+  <img src="https://img.shields.io/badge/file-AES--GCM-8FD0B0?style=flat-square&labelColor=101614" alt="aes">
+  <img src="https://img.shields.io/badge/log-audit-5F756C?style=flat-square&labelColor=101614" alt="audit">
+</p>
 
-中文界面、前后端分离的金融学科研全流程演示系统：选题与文献 → EDC/数据清洗与统计 → 论文写作 → 审稿回修，集成 **Claude API**（可配置）与 **数据脱敏 / 审计** 能力。
+科研辅助的全栈演示：选题、清洗、写作、回修。和系统有关的部分是 Compose 部署、JWT、上传文件的 AES-GCM，以及送模型前的脱敏和审计。业务本身不是沙箱。看运行时请去 [sandbench](https://github.com/shenshuo-maker/sandbench)。
+
+```mermaid
+flowchart LR
+  U["上传"] --> E["AES-GCM 落盘"]
+  E --> M["脱敏"]
+  M --> L["调用模型 / 演示占位"]
+  L --> A["审计日志"]
+```
+
 
 ## 技术栈
 
